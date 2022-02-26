@@ -1,0 +1,60 @@
+# s3 and s4 objects 
+install.packages("pryr")
+library(pryr)
+# 1. object : store the data elements it can be variable , vector , list , matrix and df 
+data("trees")
+# here i am using inbuild dataset that has the information Diameter, Height and Volume for Black Cherry
+#Trees 
+head(trees)
+# tells the  type of dataset is list
+typeof(trees)
+# tells the certain attributes of the dataset like names , rownames ,class , formula ,outer , labels , units 
+attributes(trees)
+# this is used to check whether the object is S4 object it says FALSE which means it is 
+# an S3 object 
+isS4(trees)
+class(trees)
+# gives the top 6 hits of the attribute girth of the object 
+head(trees$Girth)
+summary(trees)
+# mean() function doesnt work as trees  is a list not numeric 
+mean(trees) 
+#print() works by printing all the dataset in the chickweight 
+print(trees)
+otype(trees)# tells the type  of object here it is S3 object 
+## S3 class for dataset trees
+trees_s3 = function(g, h, v) {
+  tree = list(Girth = g, Height = h, Volume = v)
+  class(tree) <- "trees_s3"
+  tree
+}
+# Define print function for trees_s3
+print.trees_s3 <- function(tree) {
+  cat("Girth: ", tree$Girth, "\n")
+  cat("Height: ", tree$Height, "\n")
+  cat("Volume: ", tree$Volume, "\n")
+}
+# Create tree_s3 objects for each row in dataset trees
+cat("Dataset trees as S3 objects:\n")
+apply(trees, 1, function(x) trees_s3(x[1],x[2],x[3]))
+
+# S4 class created for dataset trees
+setClass("trees_s4",
+         representation(
+           Girth="numeric",
+           Height="numeric",
+           Volume="numeric")
+)
+
+# Define show function for trees_s4
+setMethod("show", "trees_s4",
+          function(object) {
+            cat("Girth: ", object@Girth, "\n")
+            cat("Height: ", object@Height, "\n")
+            cat("Volume: ", object@Volume, "\n")
+          }
+)
+
+# Create tree_s4 objects for each row in dataset trees
+cat("Dataset trees as S4 objects:\n")
+apply(trees, 1, function(x) new("trees_s4", Girth=x[1], Height=x[2], Volume=x[3]))
